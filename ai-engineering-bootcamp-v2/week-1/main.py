@@ -1,5 +1,6 @@
 """Week 1 live demo — five stages in one file, built up live in class."""
 
+import logging
 import os
 import time
 import uuid
@@ -12,6 +13,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import OpenAI
 from pinecone import Pinecone
 from pydantic import BaseModel, Field, ValidationError
+
+logger = logging.getLogger(__name__)
 
 # Load .env from this folder so the key is found regardless of shell working directory.
 _ENV_PATH = Path(__file__).resolve().parent / ".env"
@@ -213,6 +216,7 @@ def pinecone_health_endpoint() -> dict[str, Any]:
     except HTTPException:
         raise
     except Exception as exc:
+        logger.exception("Pinecone health check failed")
         raise HTTPException(
             status_code=503, detail="Pinecone index is unreachable or unavailable."
         ) from exc

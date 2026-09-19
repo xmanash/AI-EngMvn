@@ -96,9 +96,10 @@ class IngestRequest(BaseModel):
 def _pinecone_settings() -> tuple[Pinecone, str, str]:
     """Create a Pinecone index client from environment-only configuration."""
 
-    api_key = os.getenv("PINECONE_API_KEY")
-    index_name = os.getenv("PINECONE_INDEX_NAME")
-    namespace = os.getenv("PINECONE_NAMESPACE", "default")
+    # Hosted dashboards can accidentally preserve pasted line endings.
+    api_key = os.getenv("PINECONE_API_KEY", "").strip()
+    index_name = os.getenv("PINECONE_INDEX_NAME", "").strip()
+    namespace = os.getenv("PINECONE_NAMESPACE", "default").strip() or "default"
     if not api_key or not index_name:
         raise HTTPException(
             status_code=500,

@@ -107,7 +107,11 @@ st.set_page_config(page_title="Week 1 /ask Demo", layout="wide")
 st.title("Week 1 — `/ask` Demo Runner")
 st.caption("One page, five sections. Copy the commands below, start the matching server, then hit **Run test**.")
 
-base_url = st.sidebar.text_input("API base URL", "http://127.0.0.1:8000")
+base_url = st.sidebar.text_input(
+    "API base URL",
+    "http://127.0.0.1:8000",
+    help="Local: http://127.0.0.1:8000  |  Live: https://your-service.onrender.com",
+)
 
 st.sidebar.markdown("### Run this page")
 st.sidebar.code(
@@ -159,6 +163,19 @@ for tab, stage in zip(tabs, STAGES):
                 status, data = call_ask(base_url, payload)
             if status:
                 st.markdown(f"**HTTP {status}**")
+            if isinstance(data, dict):
+                answer = data.get("answer")
+                if isinstance(answer, dict):
+                    answer_text = answer.get("answer", "")
+                else:
+                    answer_text = answer
+                if answer_text is not None:
+                    st.markdown("**answer**")
+                    st.write(answer_text)
+                cols = st.columns(3)
+                cols[0].metric("tokens_used", data.get("tokens_used", "—"))
+                cols[1].metric("cost_usd", data.get("cost_usd", "—"))
+                cols[2].metric("model", data.get("model", "—"))
             st.json(data)
 
 st.sidebar.divider()
